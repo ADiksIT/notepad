@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Input;
 using Microsoft.Win32;
+using NotepadApp.Services;
 
 namespace NotepadApp
 {
@@ -44,34 +45,13 @@ namespace NotepadApp
             LblCursorPosition.Text = _data;
             reader.Close();
         }
-
-        private void SaveFile_OnClick(object sender, RoutedEventArgs e) => OnSave();
         
-        private void SaveAsFile_OnClick(object sender, RoutedEventArgs e) => OnSaveAs();
-
-        private void OnSaveAs()
-        {
-            SaveFileDialog dialog = new SaveFileDialog
-            {
-                Filter = "Text file|*.txt",
-                FileName = "note"
-            };
-            
-            if (dialog.ShowDialog() == true)
-                File.WriteAllText(dialog.FileName, NotepadField.Text);
-        }
-
-        private void OnSave()
-        {
-            if (_fileName == "")
-            {
-                OnSaveAs();
-                return;
-            }
-            
-            File.WriteAllText(_fileName, NotepadField.Text);
-        }
-
+        private void SaveFile_OnClick(object sender, RoutedEventArgs e) =>
+            SaveService.OnSave(_fileName, NotepadField.Text);
+        
+        private void SaveAsFile_OnClick(object sender, RoutedEventArgs e) => 
+            SaveService.OnSaveAs(NotepadField.Text);
+        
         private void NotepadField_SelectionChanged(object sender, RoutedEventArgs e)
         {
             int row = NotepadField.GetLineIndexFromCharacterIndex(NotepadField.CaretIndex);
@@ -101,7 +81,7 @@ namespace NotepadApp
         private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
         {
             if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.S)
-                OnSave();
+                SaveService.OnSave(_fileName, NotepadField.Text);
         }
     }
 }
