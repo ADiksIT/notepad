@@ -42,6 +42,7 @@
                 x:Name="NotepadField"
                 AcceptsReturn="True" 
                 SelectionChanged="NotepadField_SelectionChanged"
+                TextChanged="NotepadField_OnTextChanged"
                 TextWrapping="Wrap"
                 VerticalScrollBarVisibility="Auto" 
                 BorderThickness="1,1,1,1" 

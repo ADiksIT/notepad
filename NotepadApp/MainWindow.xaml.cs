@@ -1,5 +1,6 @@
 ﻿using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.Win32;
 using NotepadApp.Services;
@@ -9,7 +10,7 @@ namespace NotepadApp
     public partial class MainWindow
     {
         private string _fileName = "";
-        private string _data;
+        private string _statusBarInfo;
 
         public MainWindow()
         {
@@ -37,28 +38,34 @@ namespace NotepadApp
                 return;
             }
             
-            var reader = new StreamReader(dialog.FileName);
+            StreamReader reader = new StreamReader(dialog.FileName);
             NotepadField.Text = reader.ReadToEnd();
-
-            int stringsCount = NotepadField.Text.Split(' ').Length;
-            _data = $"Count: {NotepadField.LineCount}, Strings count: {stringsCount}, Symbols count: {NotepadField.Text.Length}";
-            LblCursorPosition.Text = _data;
             reader.Close();
+            
+            UpdateInfoOfStatusBar();
+        }
+
+        private void UpdateInfoOfStatusBar()
+        {
+            int stringsCount = NotepadField.Text.Split(' ').Length;
+            _statusBarInfo = $"Count: {NotepadField.LineCount}, Strings count: {stringsCount}, Symbols count: {NotepadField.Text.Length}";
+            LblCursorPosition.Text = _statusBarInfo;
         }
         
+        private void NotepadField_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            int row = NotepadField.GetLineIndexFromCharacterIndex(NotepadField.CaretIndex) + 1;
+            int col = NotepadField.CaretIndex - NotepadField.GetCharacterIndexFromLineIndex(row) + 1;
+            LblCursorPosition.Text = $"Line: {row}, Chars: {col}, {_statusBarInfo}";
+        }
+
         private void SaveFile_OnClick(object sender, RoutedEventArgs e) =>
             SaveService.OnSave(_fileName, NotepadField.Text);
         
         private void SaveAsFile_OnClick(object sender, RoutedEventArgs e) => 
             SaveService.OnSaveAs(NotepadField.Text);
         
-        private void NotepadField_SelectionChanged(object sender, RoutedEventArgs e)
-        {
-            int row = NotepadField.GetLineIndexFromCharacterIndex(NotepadField.CaretIndex);
-            int col = NotepadField.CaretIndex - NotepadField.GetCharacterIndexFromLineIndex(row);
-            LblCursorPosition.Text = $"Line: {row + 1}, Chars: {col + 1}, {_data}";
-        }
-
+     
         private void Window_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
           
@@ -83,5 +90,7 @@ namespace NotepadApp
             if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.S)
                 SaveService.OnSave(_fileName, NotepadField.Text);
         }
+
+        private void NotepadField_OnTextChanged(object sender, TextChangedEventArgs e) => UpdateInfoOfStatusBar();
     }
 }
