@@ -8,7 +8,7 @@
         Height="487"
         Width="375"
         PreviewMouseWheel="Window_PreviewMouseWheel"
-        >
+        KeyDown="MainWindow_OnKeyDown">
     <Grid >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -24,7 +24,6 @@
               Grid.Column="0">
             <Menu Height="25" VerticalAlignment="Top">
                 <MenuItem Header="File">
-                    <MenuItem Header="New Project" ></MenuItem>
                     <MenuItem Header="Save" Click="SaveFile_OnClick"></MenuItem>
                     <MenuItem Header="Save as" Click="SaveAsFile_OnClick"></MenuItem>
                     <MenuItem Header="Open File" Click="OpenFile_OnClick"></MenuItem>
@@ -39,7 +38,14 @@
         <Grid Grid.Row="1"
           Grid.Column="0"
           Grid.ColumnSpan="2">
-            <TextBox x:Name="NotepadField" AcceptsReturn="True"  SelectionChanged="NotepadField_SelectionChanged" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" BorderThickness="1,1,1,1" />
+            <TextBox 
+                x:Name="NotepadField"
+                AcceptsReturn="True" 
+                SelectionChanged="NotepadField_SelectionChanged"
+                TextWrapping="Wrap"
+                VerticalScrollBarVisibility="Auto" 
+                BorderThickness="1,1,1,1" 
+                Padding="5, 0, 0, 0"/>
         </Grid>
 
         <StatusBar Grid.Row="2"
@@ -47,7 +53,7 @@
                 Grid.ColumnSpan="2"
                 >
             <StatusBarItem >
-                <TextBlock Name="lblCursorPosition" Height="20" FlowDirection="RightToLeft" FontSize="14"/>
+                <TextBlock Name="LblCursorPosition" Height="20" FlowDirection="RightToLeft" FontSize="14"/>
             </StatusBarItem>
         </StatusBar>
     </Grid>

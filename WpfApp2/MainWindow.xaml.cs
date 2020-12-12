@@ -1,9 +1,5 @@
-﻿using System;
-using System.Diagnostics;
-using System.Globalization;
-using System.IO;
+﻿using System.IO;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 using Microsoft.Win32;
 
@@ -11,7 +7,7 @@ namespace WpfApp2
 {
     public partial class MainWindow
     {
-        private string _fileName;
+        private string _fileName = "";
         private string _data;
 
         public MainWindow()
@@ -45,39 +41,42 @@ namespace WpfApp2
 
             int stringsCount = NotepadField.Text.Split(' ').Length;
             _data = $"Count: {NotepadField.LineCount}, Strings count: {stringsCount}, Symbols count: {NotepadField.Text.Length}";
-            lblCursorPosition.Text = _data;
+            LblCursorPosition.Text = _data;
             reader.Close();
         }
 
-        //TODO проверка есть ли такой файл, и вызывать save as
-        private void SaveFile_OnClick(object sender, RoutedEventArgs e)
-        {
-            if (_fileName == "")
-            {
-                MessageBox.Show("BAN");
-                return;
-            }
-            
-            File.WriteAllText(_fileName, NotepadField.Text);
-        }
+        private void SaveFile_OnClick(object sender, RoutedEventArgs e) => OnSave();
         
+        private void SaveAsFile_OnClick(object sender, RoutedEventArgs e) => OnSaveAs();
 
-        private void SaveAsFile_OnClick(object sender, RoutedEventArgs e)
+        private void OnSaveAs()
         {
             SaveFileDialog dialog = new SaveFileDialog
             {
-                Filter = "Text file|*.txt"
+                Filter = "Text file|*.txt",
+                FileName = "note"
             };
             
             if (dialog.ShowDialog() == true)
                 File.WriteAllText(dialog.FileName, NotepadField.Text);
         }
 
+        private void OnSave()
+        {
+            if (_fileName == "")
+            {
+                OnSaveAs();
+                return;
+            }
+            
+            File.WriteAllText(_fileName, NotepadField.Text);
+        }
+
         private void NotepadField_SelectionChanged(object sender, RoutedEventArgs e)
         {
             int row = NotepadField.GetLineIndexFromCharacterIndex(NotepadField.CaretIndex);
             int col = NotepadField.CaretIndex - NotepadField.GetCharacterIndexFromLineIndex(row);
-            lblCursorPosition.Text = "Line " + (row + 1) + ", Char " + (col + 1) + " " + _data;
+            LblCursorPosition.Text = $"Line: {row + 1}, Chars: {col + 1}, {_data}";
         }
 
         private void Window_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
@@ -97,6 +96,12 @@ namespace WpfApp2
                 if (NotepadField.FontSize > 6)
                     NotepadField.FontSize--;
             }
+        }
+
+        private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.S)
+                OnSave();
         }
     }
 }
