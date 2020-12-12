@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Input;
 using Microsoft.Win32;
 
-namespace WpfApp2
+namespace NotepadApp
 {
     public partial class MainWindow
     {

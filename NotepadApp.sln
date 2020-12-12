@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp2", "WpfApp2\WpfApp2.csproj", "{20B76B97-15A9-4EBC-AAEC-7947DFC2356B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotepadApp", "NotepadApp\NotepadApp.csproj", "{20B76B97-15A9-4EBC-AAEC-7947DFC2356B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
