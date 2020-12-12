@@ -47,16 +47,19 @@ namespace NotepadApp
 
         private void UpdateInfoOfStatusBar()
         {
-            int stringsCount = NotepadField.Text.Split(' ').Length;
-            _statusBarInfo = $"Count: {NotepadField.LineCount}, Strings count: {stringsCount}, Symbols count: {NotepadField.Text.Length}";
-            LblCursorPosition.Text = _statusBarInfo;
+            if (NotepadField.Text != " ")
+            {
+                int stringsCount = NotepadField.Text.Split(' ').Length;
+                _statusBarInfo = $"Count: {NotepadField.LineCount}, Strings count: {stringsCount}, Symbols count: {NotepadField.Text.Length}";
+                LblCursorPosition.Text = _statusBarInfo;   
+            }
         }
         
         private void NotepadField_SelectionChanged(object sender, RoutedEventArgs e)
         {
-            int row = NotepadField.GetLineIndexFromCharacterIndex(NotepadField.CaretIndex) + 1;
-            int col = NotepadField.CaretIndex - NotepadField.GetCharacterIndexFromLineIndex(row) + 1;
-            LblCursorPosition.Text = $"Line: {row}, Chars: {col}, {_statusBarInfo}";
+            int row = NotepadField.GetLineIndexFromCharacterIndex(NotepadField.CaretIndex);
+            int col = NotepadField.CaretIndex - NotepadField.GetCharacterIndexFromLineIndex(row);
+            LblCursorPosition.Text = $"Line: {row + 1}, Chars: {col + 1}, {_statusBarInfo}";
         }
 
         private void SaveFile_OnClick(object sender, RoutedEventArgs e) =>
