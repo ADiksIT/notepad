@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.ComponentModel;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -17,7 +19,7 @@ namespace NotepadApp
             InitializeComponent();
             Title = "Notepad";
         }
-        
+
         private void OpenFile_OnClick(object sender, RoutedEventArgs e)
         {
             var dialog = new OpenFileDialog
@@ -25,23 +27,23 @@ namespace NotepadApp
                 Filter = "Текстовые файлы (*.txt)|*.txt|Документы (*.docx)|*.docx|Все файлы (*.*)|*.*",
                 FilterIndex = 1
             };
-            
+
             dialog.ShowDialog();
-            
+
             _fileName = dialog.FileName;
-            
+
             Title = dialog.SafeFileName;
-            
+
             if (!File.Exists(_fileName))
             {
                 MessageBox.Show("Unable to open file", "Error", MessageBoxButton.OK);
                 return;
             }
-            
+
             StreamReader reader = new StreamReader(dialog.FileName);
             NotepadField.Text = reader.ReadToEnd();
             reader.Close();
-            
+
             UpdateInfoOfStatusBar();
         }
 
@@ -50,11 +52,12 @@ namespace NotepadApp
             if (NotepadField.Text != " ")
             {
                 int stringsCount = NotepadField.Text.Split(' ').Length;
-                _statusBarInfo = $"Count: {NotepadField.LineCount}, Strings count: {stringsCount}, Symbols count: {NotepadField.Text.Length}";
-                LblCursorPosition.Text = _statusBarInfo;   
+                _statusBarInfo =
+                    $"Count: {NotepadField.LineCount}, Strings count: {stringsCount}, Symbols count: {NotepadField.Text.Length}";
+                LblCursorPosition.Text = _statusBarInfo;
             }
         }
-        
+
         private void NotepadField_SelectionChanged(object sender, RoutedEventArgs e)
         {
             int row = NotepadField.GetLineIndexFromCharacterIndex(NotepadField.CaretIndex);
@@ -64,14 +67,13 @@ namespace NotepadApp
 
         private void SaveFile_OnClick(object sender, RoutedEventArgs e) =>
             SaveService.OnSave(_fileName, NotepadField.Text);
-        
-        private void SaveAsFile_OnClick(object sender, RoutedEventArgs e) => 
+
+        private void SaveAsFile_OnClick(object sender, RoutedEventArgs e) =>
             SaveService.OnSaveAs(NotepadField.Text);
-        
-     
+
+
         private void Window_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
-          
             if (Keyboard.Modifiers != ModifierKeys.Control)
                 return;
 
@@ -80,7 +82,7 @@ namespace NotepadApp
                 if (NotepadField.FontSize < 72)
                     NotepadField.FontSize++;
             }
-                
+
             if (e.Delta < 0)
             {
                 if (NotepadField.FontSize > 6)
@@ -95,5 +97,28 @@ namespace NotepadApp
         }
 
         private void NotepadField_OnTextChanged(object sender, TextChangedEventArgs e) => UpdateInfoOfStatusBar();
+        
+        private void MainWindow_OnClosing(object sender, CancelEventArgs e)
+        {
+            var answer = MessageBox.Show(
+                "Save changed?",
+                "Save",
+                MessageBoxButton.YesNoCancel,
+                MessageBoxImage.Question
+            );
+
+            switch (answer)
+            {
+                case MessageBoxResult.Yes:
+                    SaveService.OnSave(_fileName, NotepadField.Text);
+                    break;
+                case MessageBoxResult.Cancel:
+                    e.Cancel = true;
+                    break;
+                default:
+                    MessageBox.Show("Unknown Error");
+                    break;
+            }
+        }
     }
 }

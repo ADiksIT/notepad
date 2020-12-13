@@ -8,7 +8,8 @@
         Height="487"
         Width="375"
         PreviewMouseWheel="Window_PreviewMouseWheel"
-        KeyDown="MainWindow_OnKeyDown">
+        Closing="MainWindow_OnClosing"
+        >
     <Grid >
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
