@@ -1,4 +1,4 @@
-﻿using  System.IO;
+﻿using System.IO;
 using Microsoft.Win32;
 
 namespace NotepadApp.Services
@@ -19,6 +19,25 @@ namespace NotepadApp.Services
             }
             
             File.WriteAllText(fileName, text);
+        }
+        
+        /// <summary>
+        /// Methods opened selected file
+        /// </summary>
+        /// <returns>
+        /// fileName with extensions, fileName but no extensions
+        /// </returns>
+        public static (string, string) OnOpenFile()
+        {
+            var dialog = new OpenFileDialog
+            {
+                Filter = "Текстовые файлы (*.txt)|*.txt|Документы (*.docx)|*.docx|Все файлы (*.*)|*.*",
+                FilterIndex = 1
+            };
+
+            dialog.ShowDialog();
+
+            return (dialog.FileName, dialog.SafeFileName);
         }
         
         /// <summary>
