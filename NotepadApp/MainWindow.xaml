@@ -7,6 +7,7 @@
         Title="Main Worm" 
         Height="487"
         Width="375"
+        KeyDown="MainWindow_OnKeyDown"
         PreviewMouseWheel="Window_PreviewMouseWheel"
         Closing="MainWindow_OnClosing"
         >

@@ -1,10 +1,8 @@
-﻿using System;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Microsoft.Win32;
 using NotepadApp.Services;
 
 namespace NotepadApp
@@ -20,49 +18,19 @@ namespace NotepadApp
             Title = "Notepad";
         }
 
+        //events
         private void OpenFile_OnClick(object sender, RoutedEventArgs e)
         {
-            var dialog = new OpenFileDialog
-            {
-                Filter = "Текстовые файлы (*.txt)|*.txt|Документы (*.docx)|*.docx|Все файлы (*.*)|*.*",
-                FilterIndex = 1
-            };
-
-            dialog.ShowDialog();
-
-            _fileName = dialog.FileName;
-
-            Title = dialog.SafeFileName;
-
+            (_fileName, Title) = SaveService.OnOpenFile();
+            
             if (!File.Exists(_fileName))
             {
                 MessageBox.Show("Unable to open file", "Error", MessageBoxButton.OK);
                 return;
             }
 
-            StreamReader reader = new StreamReader(dialog.FileName);
-            NotepadField.Text = reader.ReadToEnd();
-            reader.Close();
-
+            NotepadField.Text = File.ReadAllText(_fileName);
             UpdateInfoOfStatusBar();
-        }
-
-        private void UpdateInfoOfStatusBar()
-        {
-            if (NotepadField.Text != " ")
-            {
-                int stringsCount = NotepadField.Text.Split(' ').Length;
-                _statusBarInfo =
-                    $"Count: {NotepadField.LineCount}, Strings count: {stringsCount}, Symbols count: {NotepadField.Text.Length}";
-                LblCursorPosition.Text = _statusBarInfo;
-            }
-        }
-
-        private void NotepadField_SelectionChanged(object sender, RoutedEventArgs e)
-        {
-            int row = NotepadField.GetLineIndexFromCharacterIndex(NotepadField.CaretIndex);
-            int col = NotepadField.CaretIndex - NotepadField.GetCharacterIndexFromLineIndex(row);
-            LblCursorPosition.Text = $"Line: {row + 1}, Chars: {col + 1}, {_statusBarInfo}";
         }
 
         private void SaveFile_OnClick(object sender, RoutedEventArgs e) =>
@@ -71,6 +39,14 @@ namespace NotepadApp
         private void SaveAsFile_OnClick(object sender, RoutedEventArgs e) =>
             SaveService.OnSaveAs(NotepadField.Text);
 
+        private void NotepadField_SelectionChanged(object sender, RoutedEventArgs e)
+        {
+            int row = NotepadField.GetLineIndexFromCharacterIndex(NotepadField.CaretIndex);
+            int col = NotepadField.CaretIndex - NotepadField.GetCharacterIndexFromLineIndex(row);
+            LblCursorPosition.Text = $"Line: {row + 1}, Chars: {col + 1}, {_statusBarInfo}";
+        }
+
+        private void NotepadField_OnTextChanged(object sender, TextChangedEventArgs e) => UpdateInfoOfStatusBar();
 
         private void Window_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
@@ -96,8 +72,6 @@ namespace NotepadApp
                 SaveService.OnSave(_fileName, NotepadField.Text);
         }
 
-        private void NotepadField_OnTextChanged(object sender, TextChangedEventArgs e) => UpdateInfoOfStatusBar();
-        
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
             var answer = MessageBox.Show(
@@ -115,9 +89,18 @@ namespace NotepadApp
                 case MessageBoxResult.Cancel:
                     e.Cancel = true;
                     break;
-                default:
-                    MessageBox.Show("Unknown Error");
-                    break;
+            }
+        }
+        
+        //methods
+        private void UpdateInfoOfStatusBar()
+        {
+            if (NotepadField.Text != " ")
+            {
+                int stringsCount = NotepadField.Text.Split(' ').Length;
+                _statusBarInfo =
+                    $"Count: {NotepadField.LineCount}, Strings count: {stringsCount}, Symbols count: {NotepadField.Text.Length}";
+                LblCursorPosition.Text = _statusBarInfo;
             }
         }
     }
