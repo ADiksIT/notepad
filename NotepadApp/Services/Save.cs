@@ -10,11 +10,11 @@ namespace NotepadApp.Services
         /// </summary>
         /// <param name="fileName">The name of the file to be saved along with the extension</param>
         /// <param name="text">Text to be saves</param>
-        public static void OnSave(string fileName, string text)
+        public static void OnSave(ref string fileName, string text)
         {
             if (fileName == "")
             {
-                OnSaveAs(text);
+                OnSaveAs(text, ref fileName);
                 return;
             }
             
@@ -39,12 +39,13 @@ namespace NotepadApp.Services
 
             return (dialog.FileName, dialog.SafeFileName);
         }
-        
+
         /// <summary>
         /// Opens a dialog window "Save As" for saving a file  
         /// </summary>
         /// <param name="text">Text to be saves in new file</param>
-        public static void OnSaveAs(string text)
+        /// <param name="fileName">ref fileName to bring this back to the base class</param>
+        public static void OnSaveAs(string text, ref string fileName)
         {
             SaveFileDialog dialog = new SaveFileDialog
             {
@@ -53,7 +54,10 @@ namespace NotepadApp.Services
             };
             
             if (dialog.ShowDialog() == true)
+            {
                 File.WriteAllText(dialog.FileName, text);
+                fileName = dialog.FileName;
+            }
         }
     }
 }

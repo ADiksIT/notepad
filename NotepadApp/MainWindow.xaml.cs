@@ -11,6 +11,7 @@ namespace NotepadApp
     {
         private string _fileName = "";
         private string _statusBarInfo;
+        private bool _isSaved;
 
         public MainWindow()
         {
@@ -30,15 +31,21 @@ namespace NotepadApp
             }
 
             NotepadField.Text = File.ReadAllText(_fileName);
-            UpdateInfoOfStatusBar();
+            SaveStatusUpdate(true);
         }
 
-        private void SaveFile_OnClick(object sender, RoutedEventArgs e) =>
-            SaveService.OnSave(_fileName, NotepadField.Text);
-
-        private void SaveAsFile_OnClick(object sender, RoutedEventArgs e) =>
-            SaveService.OnSaveAs(NotepadField.Text);
-
+        private void SaveFile_OnClick(object sender, RoutedEventArgs e)
+        {
+            SaveService.OnSave(ref _fileName, NotepadField.Text);
+            SaveStatusUpdate(true);
+        }
+        
+        private void SaveAsFile_OnClick(object sender, RoutedEventArgs e)
+        {
+            SaveService.OnSaveAs(NotepadField.Text, ref _fileName);
+            SaveStatusUpdate(true);
+        }
+        
         private void NotepadField_SelectionChanged(object sender, RoutedEventArgs e)
         {
             int row = NotepadField.GetLineIndexFromCharacterIndex(NotepadField.CaretIndex);
@@ -46,7 +53,7 @@ namespace NotepadApp
             LblCursorPosition.Text = $"Line: {row + 1}, Chars: {col + 1}, {_statusBarInfo}";
         }
 
-        private void NotepadField_OnTextChanged(object sender, TextChangedEventArgs e) => UpdateInfoOfStatusBar();
+        private void NotepadField_OnTextChanged(object sender, TextChangedEventArgs e) => SaveStatusUpdate(false);
 
         private void Window_PreviewMouseWheel(object sender, MouseWheelEventArgs e)
         {
@@ -69,11 +76,16 @@ namespace NotepadApp
         private void MainWindow_OnKeyDown(object sender, KeyEventArgs e)
         {
             if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.S)
-                SaveService.OnSave(_fileName, NotepadField.Text);
+            {
+                SaveService.OnSave(ref _fileName, NotepadField.Text);
+                SaveStatusUpdate(true);
+            }
         }
 
         private void MainWindow_OnClosing(object sender, CancelEventArgs e)
         {
+            if (_isSaved) return;
+            
             var answer = MessageBox.Show(
                 "Save changed?",
                 "Save",
@@ -84,7 +96,7 @@ namespace NotepadApp
             switch (answer)
             {
                 case MessageBoxResult.Yes:
-                    SaveService.OnSave(_fileName, NotepadField.Text);
+                    SaveService.OnSave(ref _fileName, NotepadField.Text);
                     break;
                 case MessageBoxResult.Cancel:
                     e.Cancel = true;
@@ -93,13 +105,19 @@ namespace NotepadApp
         }
         
         //methods
+        private void SaveStatusUpdate(bool status)
+        {
+            _isSaved = status;
+            UpdateInfoOfStatusBar();
+        }
+        
         private void UpdateInfoOfStatusBar()
         {
             if (NotepadField.Text != " ")
             {
                 int stringsCount = NotepadField.Text.Split(' ').Length;
                 _statusBarInfo =
-                    $"Count: {NotepadField.LineCount}, Strings count: {stringsCount}, Symbols count: {NotepadField.Text.Length}";
+                    $"Saved: {_isSaved}, Count: {NotepadField.LineCount}, Strings count: {stringsCount}, Symbols count: {NotepadField.Text.Length}";
                 LblCursorPosition.Text = _statusBarInfo;
             }
         }
