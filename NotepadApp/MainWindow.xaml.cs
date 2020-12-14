@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.IO;
-using System.Transactions;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -37,13 +36,13 @@ namespace NotepadApp
 
         private void SaveFile_OnClick(object sender, RoutedEventArgs e)
         {
-            SaveService.OnSave(_fileName, NotepadField.Text);
+            SaveService.OnSave(ref _fileName, NotepadField.Text);
             SaveStatusUpdate(true);
         }
         
         private void SaveAsFile_OnClick(object sender, RoutedEventArgs e)
         {
-            SaveService.OnSaveAs(NotepadField.Text);
+            SaveService.OnSaveAs(NotepadField.Text, ref _fileName);
             SaveStatusUpdate(true);
         }
         
@@ -78,7 +77,7 @@ namespace NotepadApp
         {
             if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.S)
             {
-                SaveService.OnSave(_fileName, NotepadField.Text);
+                SaveService.OnSave(ref _fileName, NotepadField.Text);
                 SaveStatusUpdate(true);
             }
         }
@@ -97,7 +96,7 @@ namespace NotepadApp
             switch (answer)
             {
                 case MessageBoxResult.Yes:
-                    SaveService.OnSave(_fileName, NotepadField.Text);
+                    SaveService.OnSave(ref _fileName, NotepadField.Text);
                     break;
                 case MessageBoxResult.Cancel:
                     e.Cancel = true;
